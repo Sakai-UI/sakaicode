@@ -1,0 +1,104 @@
+{
+  "theme": {
+    "name": "Sakai Code Theme",
+    "version": "1.0",
+
+    "syntax": [
+      {
+        "default": {
+          "color": "#E0DEF4",
+          "paper-color": "#232136",
+          "font": {
+            "family": "JetBrains Mono",
+            "font-size": 10,
+            "font-weight": "bold",
+            "italic": false
+          }
+        }
+      },
+      {
+        "keyword": {
+          "color": "#FF8CCE",
+          "paper-color": "#232136",
+          "font": {
+            "family": "JetBrains Mono",
+            "font-size": 10,
+            "font-weight": "bold",
+            "italic": false
+          }
+        }
+      },
+      {
+        "classes": {
+          "color": "#FF8CCE",
+          "paper-color": "#232136",
+          "font": {
+            "family": "JetBrains Mono",
+            "font-size": 10,
+            "font-weight": "bold",
+            "italic": false
+          }
+        }
+    },
+    {
+      "functions": {
+        "color": "#C4A7E7",
+        "paper-color": "#232136",
+        "font": {
+          "family": "JetBrains Mono",
+          "font-size": 10,
+          "font-weight": "bold",
+          "italic": false
+        }
+      }
+    },
+    {
+      "function_def": {
+        "color": "#EB6F92",
+        "paper-color": "#232136",
+        "font": {
+          "family": "JetBrains Mono",
+          "font-size": 10,
+          "font-weight": "bold",
+          "italic": true
+        }
+      }
+    },
+    {
+      "string": {
+        "color": "#F6C177",
+        "paper-color": "#232136"
+      }
+    },
+    {
+      "types": {
+        "color": "#FF8CCE",
+        "paper-color": "#232136"
+      }
+    },
+    {
+      "keyargs": {
+        "color": "#F6C177",
+        "paper-color": "#232136"
+      }
+    },
+    {
+      "brackets": {
+        "color": "#EB6F92",
+        "paper-color": "#232136"
+      }
+    },
+    {
+      "comments": {
+        "color": "#908caa",
+        "paper-color": "#232136"
+      }
+    },
+    {
+      "constants": {
+        "color": "#C4A7E7",
+        "paper-color": "#232136"
+      }
+    }]
+  }
+}
