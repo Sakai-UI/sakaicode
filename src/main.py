@@ -152,6 +152,12 @@ class MainWindow(QMainWindow):
       QFrame:hover {
         color: white;
       }
+      QFrame::item:hover {
+        background-color: #302C47;
+      }
+      QFrame::item:selected {
+        background-color: #302C47;
+      }
     ''')
     return frame
 

@@ -173,8 +173,8 @@ QListView::item:selected {
 }
 
 QMenuBar {
-  background-color: #232136;
-  border: 1px solid #e0def4;
+  background-color: #201e31;
+  border: 1px solid #201e31;
   padding: 3px;
   color: #e0def4;
   font-size: 15px;
@@ -183,5 +183,10 @@ QMenuBar {
 QMenuBar::item {
   background-color: #232136;
   padding: 3px;
+  color: #817c9c;
+}
+
+QMenuBar::item:hover {
+  background-color: #302C47;
   color: #e0def4;
 }
