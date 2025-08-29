@@ -11,6 +11,7 @@ from pathlib import Path
 
 from editor import Editor
 from fuzzy_searcher import SearchItem, SearchWorker
+from file_manager import FileManager
 
 class MainWindow(QMainWindow):
   def __init__(self):
@@ -154,9 +155,11 @@ class MainWindow(QMainWindow):
       }
       QFrame::item:hover {
         background-color: #302C47;
+        color: white;
       }
       QFrame::item:selected {
         background-color: #302C47;
+        color: white;
       }
     ''')
     return frame
@@ -190,6 +193,17 @@ class MainWindow(QMainWindow):
     side_bar_layout.setSpacing(15)
     side_bar_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
 
+    ##############################
+    ######### TAB VIEW ###########
+
+    # Tab widget to add editor to
+    self.tab_view = QTabWidget()
+    self.tab_view.setContentsMargins(0, 0, 0, 0)
+    self.tab_view.setTabsClosable(True)
+    self.tab_view.setMovable(True)
+    self.tab_view.setDocumentMode(True)
+    self.tab_view.tabCloseRequested.connect(self.close_tab)
+
     # Setup labels
     folder_label = self.get_side_bar_label("./src/icons/files.svg", "folder-icon")
     side_bar_layout.addWidget(folder_label)
@@ -209,41 +223,20 @@ class MainWindow(QMainWindow):
     self.file_manager_frame = self.get_frame()
     self.file_manager_frame.setMaximumWidth(400)
     self.file_manager_frame.setMinimumWidth(200)
-    tree_frame_layout = QVBoxLayout()
-    tree_frame_layout.setContentsMargins(0, 0, 0, 0)
-    tree_frame_layout.setSpacing(0)
 
-    # Create file system model to show in tree view
-    self.model = QFileSystemModel()
-    self.model.setRootPath(os.getcwd())
+    self.file_manager_layout = QVBoxLayout()
+    self.file_manager_layout.setContentsMargins(0, 0, 0, 0)
+    self.file_manager_layout.setSpacing(0)
 
-    # File system filters
-    self.model.setFilter(QDir.NoDotAndDotDot | QDir.AllDirs | QDir.Files)
+    self.file_manager = FileManager(
+      tab_view=self.tab_view,
+      set_new_tab=self.set_new_tab,
+      main_window=self
+    )
 
-    ##############################
-    ###### FILE VIEWER ##########
-    self.tree_view = QTreeView()
-    self.tree_view.setFont(QFont("JetBrains Mono", 12))
-    self.tree_view.setModel(self.model)
-    self.tree_view.setRootIndex(self.model.index(os.getcwd()))
-    self.tree_view.setSelectionMode(QTreeView.SingleSelection)
-    self.tree_view.setSelectionBehavior(QTreeView.SelectRows)
-    self.tree_view.setEditTriggers(QTreeView.NoEditTriggers)
-
-    # Add custom context menu
-    self.tree_view.setContextMenuPolicy(Qt.CustomContextMenu)
-    self.tree_view.customContextMenuRequested.connect(self.tree_view_context_menu)
-
-    # Handling click
-    self.tree_view.clicked.connect(self.tree_view_clicked)
-    self.tree_view.setIndentation(10)
-    self.tree_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-    # Hide header and hide other colums except for name
-    self.tree_view.setHeaderHidden(True) # Hiding header
-    self.tree_view.setColumnHidden(1, True)
-    self.tree_view.setColumnHidden(2, True)
-    self.tree_view.setColumnHidden(3, True)
+    # Setup layout
+    self.file_manager_layout.addWidget(self.file_manager)
+    self.file_manager_frame.setLayout(self.file_manager_layout)
 
     ##############################
     ###### SEARCH VIEW ##########
@@ -299,21 +292,6 @@ class MainWindow(QMainWindow):
     search_layout.addWidget(self.search_list_view)
 
     self.search_frame.setLayout(search_layout)
-
-    # Setup layout
-    tree_frame_layout.addWidget(self.tree_view)
-    self.file_manager_frame.setLayout(tree_frame_layout)
-
-    ##############################
-    ######### TAB VIEW ###########
-
-    # Tab widget to add editor to
-    self.tab_view = QTabWidget()
-    self.tab_view.setContentsMargins(0, 0, 0, 0)
-    self.tab_view.setTabsClosable(True)
-    self.tab_view.setMovable(True)
-    self.tab_view.setDocumentMode(True)
-    self.tab_view.tabCloseRequested.connect(self.close_tab)
 
     ##############################
     ###### SETUP WIDGETS ##########
