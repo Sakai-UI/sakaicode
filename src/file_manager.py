@@ -7,6 +7,8 @@ from PyQt5.Qsci import *
 from pathlib import Path
 import shutil
 import os
+import sys
+import subprocess
 
 from editor import Editor
 
@@ -76,13 +78,15 @@ class FileManager(QTreeView):
   def tree_view_clicked(self, index: QModelIndex):
     path = self.model.filePath(index)
     p = Path(path)
-    self.set_new_tab(p)
+    if p.is_file():
+      self.set_new_tab(p)
 
   def show_context_menu(self, pos: QPoint):
     ix = self.indexAt(pos)
     menu = QMenu()
     menu.addAction("New File")
     menu.addAction("New Folder")
+    menu.addAction("Open In File Manager")
 
     if ix.column() == 0:
       menu.addAction("Rename")
@@ -101,6 +105,8 @@ class FileManager(QTreeView):
       self.action_new_folder()
     elif action.text() == "New File":
       self.action_new_file(ix)
+    elif action.text() == "Open In File Manager":
+      self.action_open_in_file_manager(ix)
     else:
       pass
 
@@ -162,8 +168,13 @@ class FileManager(QTreeView):
                 self.tab_view.indexOf(editor)
               )
 
-  def action_new_file(self, ix):
-    f = Path(self.model.rootPath()) / "file"
+  def action_new_file(self, ix: QModelIndex):
+    root_path = self.model.rootPath()
+    if ix.column() != -1 and self.model.isDir(ix):
+      self.expand(ix)
+      root_path = self.model.filePath()
+
+    f = Path(root_path) / "file"
     count = 1
     while f.exists():
       f = Path(f.parent / f"file{count}")
@@ -182,6 +193,29 @@ class FileManager(QTreeView):
     # Edit that index
     self.edit(idx)
 
+  def action_open_in_file_manager(self, ix: QModelIndex):
+    path = os.path.abspath(self.model.filePath(ix))
+    is_dir = self.model.isDir(ix)
+    if os.name == "nt":
+      # Windows
+      if is_dir:
+        subprocess.Popen(f'explorer "{path}"')
+      else:
+        subprocess.Popen(f'explorer /select,"{path}"')
+    elif os.name == "posix":
+      # Linux or Mac OS
+      if sys.platform == "darwin":
+        # Mac OS
+        if is_dir:
+          subprocess.Popen(["open", path])
+        else:
+          subprocess.Popen(["open", "-R", path])
+      else:
+        # Linux
+        subprocess.Popen(["xdg-open", os.path.dirname(path)])
+    else:
+      raise OSError(f"Unsupported platform: {os.name}")
+
   # Drag and drop functionality
   def dragEnterEvent(self, e: QDragEnterEvent) -> None:
     if e.mimeData().hasUrls():
@@ -197,7 +231,15 @@ class FileManager(QTreeView):
         if path.is_dir():
           shutil.copytree(path, root_path / path.name)
         else:
-          shutil.copy(path, root_path / path.name)
+          if root_path.samefile(self.model.rootPath()):
+            idx: QModelIndex = self.indexAt(e.pos())
+            if idx.column() == -1:
+              shutil.move(path, root_path / path.name)
+            else:
+              folder_path = Path(self.model.filePath(idx))
+              shutil.move(path, folder_path / path.name)
+          else:
+            shutil.copy(path, root_path / path.name)
     e.accept()
 
     return super().dropEvent(e)
